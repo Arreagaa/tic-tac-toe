@@ -18,7 +18,11 @@ function App() {
     const turnFromStorage = window.localStorage.getItem("turn");
     return turnFromStorage ?? TURNS.X;
   });
-  const [winner, setWinner] = useState(null);
+  const [winner, setWinner] = useState(() => {
+    const winnerFromStorage = window.localStorage.getItem("winner");
+    if (winnerFromStorage === "null") return null;
+    return winnerFromStorage;
+  });
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
@@ -41,18 +45,24 @@ function App() {
     setTurn(newTurn);
 
     //save game
-    saveGameToStorage({
+    /*saveGameToStorage({
       board: newBoard,
       turn: newTurn,
-    });
+    });*/
 
-    const newWinner = checkWinnerFrom(newBoard);
+    let newWinner = checkWinnerFrom(newBoard);
     if (newWinner) {
       confetti();
       setWinner(newWinner);
     } else if (checkEndGame(newBoard)) {
       setWinner(false);
+      newWinner = false;
     }
+    saveGameToStorage({
+      board: newBoard,
+      turn: newTurn,
+      winner: newWinner,
+    });
   };
 
   return (
